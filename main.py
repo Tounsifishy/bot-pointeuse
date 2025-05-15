@@ -94,4 +94,4 @@ async def alltime(ctx):
         await ctx.send("Désolé, cette commande est réservée aux boss. Retourne bosser.")
 
 # Lancer le bot
-bot.run(TOKEN)
+bot.run(os.getenv("DISCORD_TOKEN"))
