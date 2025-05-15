@@ -112,6 +112,30 @@ async def addtime(ctx, member: discord.Member, hours: int = 0, minutes: int = 0,
     else:
         await ctx.send("Désolé, seuls le boos peut modifier le temps de service.")
 
+@bot.command()
+async def removetime(ctx, member: discord.Member, hours: int = 0, minutes: int = 0, seconds: int = 0):
+    """Retire du temps de service à un agent (réservé au rôle Chef)"""
+    if any(role.name == "Chef" for role in ctx.author.roles):
+        total_seconds = hours * 3600 + minutes * 60 + seconds
+
+        if member.id not in time_tracking:
+            await ctx.send(f"{member.name} est un flemmar, il n'a pas encore pris son service!")
+            return
+
+        current_total = time_tracking[member.id].get('total', 0)
+
+        if total_seconds >= current_total:
+            time_tracking[member.id]['total'] = 0
+            await ctx.send(f"Tout le temps de service de {member.name} a été retiré.")
+        else:
+            time_tracking[member.id]['total'] -= total_seconds
+            h = total_seconds // 3600
+            m = (total_seconds % 3600) // 60
+            s = total_seconds % 60
+            await ctx.send(f"{ctx.author.name} a retiré {h}h {m}m {s}s heures de service à {member.name}.")
+    else:
+        await ctx.send("T’as pas le badge Chef, tu te prend pour qui?")
+
 
 # Lancer le bot
 bot.run(TOKEN)
