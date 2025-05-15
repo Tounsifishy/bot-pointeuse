@@ -93,5 +93,25 @@ async def alltime(ctx):
     else:
         await ctx.send("Désolé, cette commande est réservée aux boss. Retourne bosser.")
 
+@bot.command()
+async def addtime(ctx, member: discord.Member, hours: int = 0, minutes: int = 0, seconds: int = 0):
+    """Ajoute du temps de service à un agent (réservé au rôle Chef)"""
+    if any(role.name == "Chef" for role in ctx.author.roles):
+        total_seconds = hours * 3600 + minutes * 60 + seconds
+
+        if member.id not in time_tracking:
+            time_tracking[member.id] = {'start': None, 'total': 0}
+
+        time_tracking[member.id]['total'] += total_seconds
+
+        h = total_seconds // 3600
+        m = (total_seconds % 3600) // 60
+        s = total_seconds % 60
+
+        await ctx.send(f"{ctx.author.name} a ajouté {h}h {m}m {s}s heures de service à l'agent {member.name}.")
+    else:
+        await ctx.send("Désolé, seuls le boos peut modifier le temps de service.")
+
+
 # Lancer le bot
 bot.run(TOKEN)
